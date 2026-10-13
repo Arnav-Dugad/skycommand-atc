@@ -125,16 +125,18 @@ test('casual: assign a gate by tapping the map, then undo', async ({ page }) => 
   await openBoardRow(page, cs, 'arr');
   await page.getByTestId('act-park').click();
   await expect(page.getByTestId('pick-banner')).toBeVisible();
-  // tap the stand of gate A2 (N2) on the canvas
-  const pt = await page.evaluate(() => {
-    const g = (globalThis as unknown as { __sky: Sky & { renderer: { camera: { defaultView: () => void; update: (d: number, i: boolean) => void }; worldToScreen: (x: number, y: number) => { x: number; y: number } } } }).__sky;
+  // tap the stand of a free narrow-body gate on the canvas
+  const { pt, gate } = await page.evaluate(() => {
+    const g = (globalThis as unknown as { __sky: Sky & { world: { gateRes: Record<string, string> }; renderer: { camera: { defaultView: () => void; update: (d: number, i: boolean) => void }; worldToScreen: (x: number, y: number) => { x: number; y: number } } } }).__sky;
+    const candidates: [string, number][] = [['N1', 860], ['N2', 1010], ['N6', 1790]];
+    const [gate, x] = candidates.find(([id]) => !g.world.gateRes[id])!;
     g.renderer.camera.defaultView();
     g.renderer.camera.update(0.016, true);
-    return g.renderer.worldToScreen(1010, 900);
+    return { pt: g.renderer.worldToScreen(x, 900), gate };
   });
   const box = await page.getByTestId('game-canvas').boundingBox();
   await page.mouse.click(box!.x + pt.x, box!.y + pt.y);
-  await expect.poll(() => page.evaluate((c) => (globalThis as unknown as { __sky: Sky }).__sky.world.aircraft.find((a) => a.callsign === c)?.gate ?? null, cs)).toBe('N2');
+  await expect.poll(() => page.evaluate((c) => (globalThis as unknown as { __sky: Sky }).__sky.world.aircraft.find((a) => a.callsign === c)?.gate ?? null, cs)).toBe(gate);
   await expect(page.getByTestId('btn-undo')).toBeVisible();
   await page.getByTestId('btn-undo').click();
   await expect.poll(() => page.evaluate((c) => (globalThis as unknown as { __sky: Sky }).__sky.world.aircraft.find((a) => a.callsign === c)?.gate ?? null, cs)).toBe(null);
