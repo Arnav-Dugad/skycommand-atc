@@ -1,0 +1,10 @@
+{
+  "name": "SKYCOMMAND — Airport Control",
+  "short_name": "SKYCOMMAND",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0b1222",
+  "theme_color": "#0b1222",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "skycommand-atc",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "skycommand-atc",
+      "database_id": "c24c88fe-eef1-4713-a76e-aadf1faab76a"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "VERIFIER", "class_name": "DailyVerifier" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DailyVerifier"] }],
+  "observability": { "enabled": true }
+}
